@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.openapigenerator</groupId>
+        <artifactId>openapi-contract-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>openapi-contract-annotations</artifactId>
+    <packaging>jar</packaging>
+
+    <name>OpenAPI Contract Generator :: Annotations</name>
+    <description>
+        Marker annotations (@ApiContract, @ApiDomain) placed on API interfaces and on
+        package-info files. This is the only compile-scope dependency an API contract
+        module needs.
+    </description>
+
+    <dependencies>
+        <!-- @RestController / @RequestMapping (meta-annotations of @ApiContract) and
+             @AliasFor. Every consumer of an API contract module already has Spring Web
+             on its classpath, so transitive 'compile' is harmless and convenient. -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+
+        <!-- Swagger annotations reused verbatim as members of @ApiDomain
+             (@Info, @Server, @SecurityScheme) and, in contract modules, on DTOs
+             (@Schema, @Operation...). -->
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations-jakarta</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+    </dependencies>
+</project>

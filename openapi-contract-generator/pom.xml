@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.openapigenerator</groupId>
+        <artifactId>openapi-contract-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>openapi-contract-generator</artifactId>
+    <packaging>jar</packaging>
+
+    <name>OpenAPI Contract Generator :: Generator</name>
+    <description>
+        Boots a server-less Spring context, registers a documentation-only proxy per
+        @ApiContract interface, groups them by @ApiDomain and writes one OpenAPI 3.1
+        document per domain. Consumed in test scope by API contract modules.
+    </description>
+
+    <!--
+      This module is a TEST HARNESS: it legitimately depends on JUnit, Spring MVC Test and
+      springdoc at 'compile' scope, the same way testcontainers modules ship their
+      JUnit support in the main artifact. A contract module depends on it with
+      <scope>test</scope>, so all of this lands in the contract module's test scope only.
+    -->
+    <dependencies>
+        <dependency>
+            <groupId>io.openapigenerator</groupId>
+            <artifactId>openapi-contract-annotations</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+
+        <!-- /v3/api-docs endpoint, no Swagger UI -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+            <version>${springdoc.version}</version>
+        </dependency>
+
+        <!-- io.swagger.v3.core.util.{Json31,Yaml31} + OpenAPI model classes.
+             Brought transitively by springdoc, declared explicitly because we compile
+             against it. -->
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-core-jakarta</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+
+        <!-- Fast classpath scan for @ApiContract / @ApiDomain. -->
+        <dependency>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+            <version>${classgraph.version}</version>
+        </dependency>
+    </dependencies>
+</project>

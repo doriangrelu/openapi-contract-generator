@@ -1,0 +1,32 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      # The runner ships Maven; add a Maven wrapper (`mvn wrapper:wrapper`) and switch
+      # to `./mvnw` for fully reproducible builds.
+      - name: Build and test
+        run: mvn -B --no-transfer-progress verify
+
+      - name: Upload generated specs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi-specs
+          path: example/target/openapi/*
+          if-no-files-found: warn

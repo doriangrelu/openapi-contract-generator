@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.openapigenerator</groupId>
+        <artifactId>openapi-contract-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>openapi-contract-example</artifactId>
+    <packaging>jar</packaging>
+
+    <name>OpenAPI Contract Generator :: Example</name>
+    <description>
+        Example API contract module with two bounded contexts (billing, catalog) and a
+        shared kernel. Demonstrates the complete consumer setup. NOT published.
+    </description>
+
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+        <maven.source.skip>true</maven.source.skip>
+    </properties>
+
+    <dependencies>
+        <!-- 1) Compile scope: the marker annotations (+ transitively spring-web,
+                swagger-annotations). -->
+        <dependency>
+            <groupId>io.openapigenerator</groupId>
+            <artifactId>openapi-contract-annotations</artifactId>
+        </dependency>
+
+        <!-- Bean Validation annotations used on the DTOs. -->
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- 2) Test scope: the generator. Brings Spring Boot test + springdoc + ClassGraph
+                transitively, in test scope only. -->
+        <dependency>
+            <groupId>io.openapigenerator</groupId>
+            <artifactId>openapi-contract-generator</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <!--
+      No plugin configuration is required. `mvn test` runs GenerateOpenApiSpecs and writes
+      target/openapi/<domain>.{json,yaml}. Override the location with
+      -Dopenapi.output.dir=... if needed.
+    -->
+</project>

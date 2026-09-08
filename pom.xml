@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.openapigenerator</groupId>
+    <artifactId>openapi-contract-parent</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>OpenAPI Contract Generator (parent)</name>
+    <description>
+        Generate one OpenAPI 3.1 document per bounded context from annotated Java API
+        interfaces, at build time, without starting an HTTP server.
+    </description>
+    <url>https://github.com/doriangrelu/openapi-contract-generator</url>
+    <inceptionYear>2026</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Dorian Grelu</name>
+            <roles>
+                <role>author</role>
+                <role>maintainer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/doriangrelu/openapi-contract-generator.git</connection>
+        <developerConnection>scm:git:git@github.com:doriangrelu/openapi-contract-generator.git</developerConnection>
+        <url>https://github.com/doriangrelu/openapi-contract-generator</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <!--
+      TODO before publishing to Maven Central: add <distributionManagement> (or the
+      central-publishing-maven-plugin), GPG signing, and decide the groupId
+      (io.openapigenerator vs io.github.<user>).
+    -->
+
+    <modules>
+        <module>openapi-contract-annotations</module>
+        <module>openapi-contract-generator</module>
+        <module>example</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- springdoc 3.x requires Java 21+ -->
+        <maven.compiler.release>21</maven.compiler.release>
+
+        <!-- Coherent set verified on Maven Central, September 2026:
+             Spring Boot 4.0 -> Spring Framework 7 ; springdoc 3.1 -> Boot 4 / OpenAPI 3.1 -->
+        <spring-boot.version>4.0.0</spring-boot.version>
+        <springdoc.version>3.1.0</springdoc.version>
+        <swagger.version>2.2.54</swagger.version>
+        <classgraph.version>4.8.194</classgraph.version>
+
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
+        <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.openapigenerator</groupId>
+                <artifactId>openapi-contract-annotations</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.openapigenerator</groupId>
+                <artifactId>openapi-contract-generator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <release>${maven.compiler.release}</release>
+                        <!-- Real parameter names: lets @RequestParam / @PathVariable omit
+                             an explicit name. The example still names them explicitly. -->
+                        <parameters>true</parameters>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <!-- Sources + Javadoc jars for every published module. The example opts out
+                 via maven.source.skip / maven.javadoc.skip. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <configuration>
+                    <quiet>true</quiet>
+                    <doclint>all,-missing</doclint>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadoc</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
