@@ -212,8 +212,9 @@ which builds, GPG-signs and uploads a bundle; with `autoPublish=false` it is rel
 one click from
 [central.sonatype.com](https://central.sonatype.com/publishing/deployments).
 
-Required repository secrets: `CENTRAL_TOKEN_USERNAME`, `CENTRAL_TOKEN_PASSWORD`,
-`GPG_PRIVATE_KEY`, `GPG_PASSPHRASE`. Details and toggles in
+Secrets live in the **`prod` GitHub Environment** (Settings → Environments → prod):
+`CENTRAL_TOKEN_USERNAME`, `CENTRAL_TOKEN_PASSWORD`, `GPG_PRIVATE_KEY` (armored *private*
+key), `GPG_PASSPHRASE`. Details and toggles in
 [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
 ---

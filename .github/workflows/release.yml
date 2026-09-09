@@ -2,15 +2,16 @@ name: release
 
 # Publishes the two library modules to Maven Central (Central Portal).
 #
-# Required repository secrets (Settings -> Secrets and variables -> Actions):
-#   CENTRAL_TOKEN_USERNAME  - Portal user token username (central.sonatype.com -> Account)
-#   CENTRAL_TOKEN_PASSWORD  - Portal user token password
-#   GPG_PRIVATE_KEY         - ASCII-armored private key: gpg --armor --export-secret-keys <KEYID>
-#   GPG_PASSPHRASE          - passphrase of that key
+# Secrets live in the GitHub Environment `prod` (Settings -> Environments -> prod):
+#   CENTRAL_TOKEN_USERNAME  Portal user token username (central.sonatype.com -> Account)
+#   CENTRAL_TOKEN_PASSWORD  Portal user token password
+#   GPG_PRIVATE_KEY         ASCII-armored *private* key:
+#                           gpg --armor --export-secret-keys <KEYID>
+#   GPG_PASSPHRASE          passphrase of that key
 #
 # Trigger: push a tag like `v0.1.0`, or run manually with an explicit version.
-# The bundle is uploaded and validated; with autoPublish=false in the parent pom it is
-# then released with one click from the Portal UI.
+# The bundle is uploaded and validated; with autoPublish=false in the parent POM it is
+# then released with one click from central.sonatype.com/publishing/deployments.
 
 on:
   push:
@@ -27,8 +28,29 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: prod
     steps:
       - uses: actions/checkout@v4
+
+      - name: Check required secrets
+        env:
+          CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          missing=
+          for name in CENTRAL_TOKEN_USERNAME CENTRAL_TOKEN_PASSWORD GPG_PRIVATE_KEY GPG_PASSPHRASE; do
+            [ -n "${!name}" ] || missing="$missing $name"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::missing or empty secret(s) in environment 'prod':$missing"
+            exit 1
+          fi
+          case "$GPG_PRIVATE_KEY" in
+            *"BEGIN PGP PRIVATE KEY BLOCK"*) ;;
+            *) echo "::error::GPG_PRIVATE_KEY is not an ASCII-armored *private* key (use: gpg --armor --export-secret-keys <KEYID>)"; exit 1 ;;
+          esac
 
       - name: Set up JDK 25
         uses: actions/setup-java@v4
@@ -39,8 +61,13 @@ jobs:
           server-id: central
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Import GPG key
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          printf '%s\n' "$GPG_PRIVATE_KEY" | gpg --batch --import
+          gpg --list-secret-keys --keyid-format=long
 
       - name: Resolve version
         id: version
