@@ -1,6 +1,7 @@
-package io.github.doriangrelu.generator;
+package io.github.doriangrelu.generator.scan;
 
 import java.util.List;
+import java.util.Objects;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
@@ -10,14 +11,16 @@ import io.github.doriangrelu.contract.ApiContract;
 import io.github.doriangrelu.contract.ApiDomain;
 
 /**
- * Classpath scan for {@link ApiContract @ApiContract} interfaces and
+ * Whole-classpath scan for {@link ApiContract @ApiContract} interfaces and
  * {@link ApiDomain @ApiDomain} packages, backed by ClassGraph.
  *
  * <p>No base package needs to be configured: the marker annotations are unique to this
- * library, so a whole-classpath scan is unambiguous. A short reject list trims the
- * obvious infrastructure namespaces to keep the scan fast.
+ * library, so the scan is unambiguous. A short reject list trims the obvious
+ * infrastructure namespaces to keep it fast.
+ *
+ * <p>Internal API.
  */
-final class ContractScanner {
+public final class ContractScanner {
 
     private static final String[] REJECTED_PACKAGES = {
             "org.springframework", "org.springdoc", "io.swagger", "io.github.classgraph",
@@ -28,44 +31,42 @@ final class ContractScanner {
 
     private final ClassLoader classLoader;
 
-    ContractScanner(ClassLoader classLoader) {
-        this.classLoader = classLoader;
+    /**
+     * @param classLoader the class loader whose classpath is scanned
+     */
+    public ContractScanner(final ClassLoader classLoader) {
+        this.classLoader = Objects.requireNonNull(classLoader, "classLoader");
     }
 
     /**
      * Runs the scan.
      *
-     * @return the {@code @ApiContract} interfaces and the names of the {@code @ApiDomain}
-     *         packages present on the classpath
+     * @return the discovered {@code @ApiContract} interfaces and {@code @ApiDomain} package
+     *         names
      */
-    Result scan() {
-        try (ScanResult result = new ClassGraph()
-                .enableClassInfo()
-                .enableAnnotationInfo()
-                .overrideClassLoaders(classLoader)
-                .rejectPackages(REJECTED_PACKAGES)
-                .scan()) {
-
-            List<Class<?>> contractInterfaces = result
+    public ScannedContracts scan() {
+        try (ScanResult result = newClassGraph().scan()) {
+            final List<Class<?>> contractInterfaces = result
                     .getClassesWithAnnotation(ApiContract.class)
                     .stream()
                     .filter(ClassInfo::isInterface)
-                    .map(ClassInfo::loadClass)
+                    .<Class<?>>map(ClassInfo::loadClass)
                     .toList();
 
-            List<String> domainPackages = result.getPackageInfo().stream()
+            final List<String> domainPackages = result.getPackageInfo().stream()
                     .filter(pkg -> pkg.hasAnnotation(ApiDomain.class.getName()))
                     .map(PackageInfo::getName)
                     .toList();
 
-            return new Result(contractInterfaces, domainPackages);
+            return new ScannedContracts(contractInterfaces, domainPackages);
         }
     }
 
-    /**
-     * @param contractInterfaces interfaces bearing {@code @ApiContract}
-     * @param domainPackages      names of packages bearing {@code @ApiDomain}
-     */
-    record Result(List<Class<?>> contractInterfaces, List<String> domainPackages) {
+    private ClassGraph newClassGraph() {
+        return new ClassGraph()
+                .enableClassInfo()
+                .enableAnnotationInfo()
+                .overrideClassLoaders(classLoader)
+                .rejectPackages(REJECTED_PACKAGES);
     }
 }

@@ -1,8 +1,9 @@
-package io.github.doriangrelu.generator;
+package io.github.doriangrelu.generator.proxy;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Objects;
 
 /**
  * Creates <em>documentation-only</em> proxies for {@code @ApiContract} interfaces.
@@ -12,8 +13,10 @@ import java.lang.reflect.Proxy;
  * produces. springdoc then documents the proxy like any {@code @RestController}. The
  * proxied endpoint methods are never invoked; calling one throws
  * {@link UnsupportedOperationException}.
+ *
+ * <p>Internal API.
  */
-final class ContractProxyFactory {
+public final class ContractProxyFactory {
 
     private ContractProxyFactory() {
     }
@@ -23,7 +26,9 @@ final class ContractProxyFactory {
      * @param classLoader       the class loader that defined {@code contractInterface}
      * @return a JDK proxy implementing {@code contractInterface}
      */
-    static Object create(Class<?> contractInterface, ClassLoader classLoader) {
+    public static Object create(final Class<?> contractInterface, final ClassLoader classLoader) {
+        Objects.requireNonNull(contractInterface, "contractInterface");
+        Objects.requireNonNull(classLoader, "classLoader");
         return Proxy.newProxyInstance(classLoader, new Class<?>[] {contractInterface},
                 new DocumentationOnlyHandler(contractInterface));
     }
@@ -31,7 +36,7 @@ final class ContractProxyFactory {
     private record DocumentationOnlyHandler(Class<?> contractInterface) implements InvocationHandler {
 
         @Override
-        public Object invoke(Object proxy, Method method, Object[] args) {
+        public Object invoke(final Object proxy, final Method method, final Object[] args) {
             return switch (method.getName()) {
                 case "toString" -> "ApiContractProxy[" + contractInterface.getName() + "]";
                 case "hashCode" -> System.identityHashCode(proxy);

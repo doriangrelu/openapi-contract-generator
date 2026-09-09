@@ -18,7 +18,7 @@ public class ApiContractConfigurationException extends RuntimeException {
     /**
      * @param message human-readable description of the inconsistency
      */
-    public ApiContractConfigurationException(String message) {
+    public ApiContractConfigurationException(final String message) {
         super(message);
     }
 
@@ -26,7 +26,7 @@ public class ApiContractConfigurationException extends RuntimeException {
      * @param message human-readable description of the inconsistency
      * @param cause   the underlying failure
      */
-    public ApiContractConfigurationException(String message, Throwable cause) {
+    public ApiContractConfigurationException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

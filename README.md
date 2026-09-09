@@ -187,6 +187,14 @@ here would then serve as the golden files validating that plugin.
 
 ---
 
+## Contributing
+
+Coding standards (`final`, immutability, streams, null handling, package structure),
+testing conventions and the release process are documented in
+[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
+
+---
+
 ## Releasing (maintainers)
 
 Artifacts are published to **Maven Central** via the Central Portal, namespace

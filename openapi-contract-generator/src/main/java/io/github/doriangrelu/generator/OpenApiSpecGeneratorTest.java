@@ -1,10 +1,13 @@
 package io.github.doriangrelu.generator;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.github.doriangrelu.generator.spring.OpenApiGeneratorApplication;
 import io.swagger.v3.core.util.Json31;
 import io.swagger.v3.core.util.Yaml31;
 import org.junit.jupiter.api.Test;
@@ -58,6 +61,8 @@ public abstract class OpenApiSpecGeneratorTest {
     public static final String OUTPUT_DIR_PROPERTY = "openapi.output.dir";
 
     private static final Path DEFAULT_OUTPUT_DIR = Path.of("target", "openapi");
+    private static final String GROUP_DOCS_PATH = "/v3/api-docs/{group}";
+    private static final Logger LOG = System.getLogger(OpenApiSpecGeneratorTest.class.getName());
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -71,23 +76,23 @@ public abstract class OpenApiSpecGeneratorTest {
                 .as("no @ApiDomain package was found on the classpath")
                 .isNotEmpty();
 
-        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-        Path outputDir = resolveOutputDir();
+        final MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        final Path outputDir = resolveOutputDir();
         Files.createDirectories(outputDir);
 
-        for (GroupedOpenApi group : groups) {
-            String json = mockMvc.perform(get("/v3/api-docs/{group}", group.getGroup()))
+        for (final GroupedOpenApi group : groups) {
+            final String json = mockMvc.perform(get(GROUP_DOCS_PATH, group.getGroup()))
                     .andExpect(status().isOk())
                     .andReturn()
                     .getResponse()
                     .getContentAsString();
 
-            Path jsonFile = outputDir.resolve(group.getGroup() + ".json");
-            Path yamlFile = outputDir.resolve(group.getGroup() + ".yaml");
+            final Path jsonFile = outputDir.resolve(group.getGroup() + ".json");
+            final Path yamlFile = outputDir.resolve(group.getGroup() + ".yaml");
             Files.writeString(jsonFile, json);
             Files.writeString(yamlFile, toYaml(json));
 
-            System.out.printf("[openapi] domain '%s' -> %s , %s%n",
+            LOG.log(Level.INFO, "@ApiDomain ''{0}'' -> {1}, {2}",
                     group.getGroup(), jsonFile.toAbsolutePath(), yamlFile.toAbsolutePath());
 
             assertThat(jsonFile).isNotEmptyFile();
@@ -96,12 +101,12 @@ public abstract class OpenApiSpecGeneratorTest {
     }
 
     private static Path resolveOutputDir() {
-        String configured = System.getProperty(OUTPUT_DIR_PROPERTY);
+        final String configured = System.getProperty(OUTPUT_DIR_PROPERTY);
         return configured != null ? Path.of(configured) : DEFAULT_OUTPUT_DIR;
     }
 
-    private static String toYaml(String json) throws Exception {
-        JsonNode tree = Json31.mapper().readTree(json);
+    private static String toYaml(final String json) throws Exception {
+        final JsonNode tree = Json31.mapper().readTree(json);
         return Yaml31.mapper().writeValueAsString(tree);
     }
 }

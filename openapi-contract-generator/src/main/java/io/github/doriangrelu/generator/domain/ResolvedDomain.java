@@ -1,5 +1,6 @@
-package io.github.doriangrelu.generator;
+package io.github.doriangrelu.generator.domain;
 
+import java.util.Objects;
 import java.util.Set;
 
 import io.github.doriangrelu.contract.ApiDomain;
@@ -13,7 +14,7 @@ import io.github.doriangrelu.contract.ApiDomain;
  * @param declaration        the annotation instance read from the {@code package-info}
  * @param packageName        the package carrying {@code @ApiDomain}
  * @param contractInterfaces the interfaces contributing operations to this domain
- *                           (defensively copied, never empty)
+ *                           (immutable copy, possibly empty)
  */
 public record ResolvedDomain(
         String id,
@@ -25,6 +26,9 @@ public record ResolvedDomain(
      * Canonical constructor; copies {@code contractInterfaces} into an immutable set.
      */
     public ResolvedDomain {
-        contractInterfaces = Set.copyOf(contractInterfaces);
+        Objects.requireNonNull(id, "id");
+        Objects.requireNonNull(declaration, "declaration");
+        Objects.requireNonNull(packageName, "packageName");
+        contractInterfaces = Set.copyOf(Objects.requireNonNull(contractInterfaces, "contractInterfaces"));
     }
 }
