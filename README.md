@@ -82,12 +82,12 @@ Three things, no build-plugin configuration:
 
 ```xml
 <dependency>
-  <groupId>io.openapigenerator</groupId>
+  <groupId>io.github.doriangrelu</groupId>
   <artifactId>openapi-contract-annotations</artifactId>
   <version>0.1.0-SNAPSHOT</version>
 </dependency>
 <dependency>
-  <groupId>io.openapigenerator</groupId>
+  <groupId>io.github.doriangrelu</groupId>
   <artifactId>openapi-contract-generator</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <scope>test</scope>
@@ -100,7 +100,7 @@ bounded context.
 **3. Add one empty test class:**
 
 ```java
-class GenerateOpenApiSpecs extends io.openapigenerator.generator.OpenApiSpecGeneratorTest {
+class GenerateOpenApiSpecs extends io.github.doriangrelu.generator.OpenApiSpecGeneratorTest {
 }
 ```
 
@@ -153,11 +153,11 @@ Verified on Maven Central, September 2026.
 
 | Component | Version | Note |
 |---|---|---|
-| Spring Boot | `4.0.0` | BOM imported; modules do **not** inherit `spring-boot-starter-parent` |
-| springdoc-openapi | `3.1.0` | Spring Boot 4 / OpenAPI 3.1 branch; **requires Java 21+** |
+| Spring Boot | `4.1.1` | BOM imported; modules do **not** inherit `spring-boot-starter-parent` |
+| springdoc-openapi | `3.1.1` | Spring Boot 3.x/4.x, OpenAPI 3.1; needs Java 21+ |
 | swagger-core | `2.2.54` | annotation vocabulary + `Json31` / `Yaml31` |
-| ClassGraph | managed by the Boot BOM | classpath scan for the markers |
-| Java | `21` | required by springdoc 3.x |
+| ClassGraph | `4.8.194` | classpath scan for the markers |
+| Java | `25` | `maven.compiler.release` |
 
 Equivalent Spring Boot 3.x stack if needed: Spring Boot `3.5.x` + springdoc `2.9.x` +
 Java 17.

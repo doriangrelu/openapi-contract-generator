@@ -58,17 +58,17 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <!-- springdoc 3.x requires Java 21+ -->
-        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.release>25</maven.compiler.release>
 
         <!-- Coherent set verified on Maven Central, September 2026:
-             Spring Boot 4.0 -> Spring Framework 7 ; springdoc 3.1 -> Boot 4 / OpenAPI 3.1 -->
-        <spring-boot.version>4.0.0</spring-boot.version>
-        <springdoc.version>3.1.0</springdoc.version>
+             Spring Boot 4.1 -> Spring Framework 7 (Java 17..26) ;
+             springdoc 3.1.1 -> Spring Boot 3.x/4.x, Java 21+, OpenAPI 3.1 -->
+        <spring-boot.version>4.1.1</spring-boot.version>
+        <springdoc.version>3.1.1</springdoc.version>
         <swagger.version>2.2.54</swagger.version>
         <classgraph.version>4.8.194</classgraph.version>
 
-        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
         <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
