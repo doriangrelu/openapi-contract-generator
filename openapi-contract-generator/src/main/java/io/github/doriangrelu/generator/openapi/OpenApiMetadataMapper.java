@@ -158,10 +158,12 @@ public final class OpenApiMetadataMapper {
                 .type(SecurityScheme.Type.valueOf(source.type().name()))
                 .description(orNull(source.description()))
                 .name(orNull(source.paramName()))
-                .$ref(orNull(source.ref()))
                 .scheme(orNull(source.scheme()))
                 .bearerFormat(orNull(source.bearerFormat()))
                 .openIdConnectUrl(orNull(source.openIdConnectUrl()));
+        if (hasText(source.ref())) {
+            scheme.set$ref(source.ref());
+        }
         if (!DEFAULT_ENUM.equals(source.in().name())) {
             scheme.setIn(SecurityScheme.In.valueOf(source.in().name()));
         }

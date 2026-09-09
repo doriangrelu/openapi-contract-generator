@@ -19,14 +19,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class OpenApiMetadataMapperTest {
 
     private ApiDomain meta;
-    private ApiDomain metabad;
     private ApiDomain minimal;
+    private ApiDomain schemeWithoutName;
+    private ApiDomain schemeWithoutType;
 
     @BeforeAll
     void loadFixtures() {
         meta = readDomain("io.github.doriangrelu.generator.fixtures.meta");
-        metabad = readDomain("io.github.doriangrelu.generator.fixtures.metabad");
         minimal = readDomain("io.github.doriangrelu.generator.fixtures.valid.catalog");
+        schemeWithoutName = readDomain("io.github.doriangrelu.generator.fixtures.metabad");
+        schemeWithoutType = readDomain("io.github.doriangrelu.generator.fixtures.metanotype");
     }
 
     @Test
@@ -79,8 +81,17 @@ class OpenApiMetadataMapperTest {
     }
 
     @Test
+    void rejectsSecuritySchemeWithoutName() {
+        final var schemes = schemeWithoutName.securitySchemes();
+
+        assertThatThrownBy(() -> OpenApiMetadataMapper.toSecuritySchemes(schemes))
+                .isInstanceOf(ApiContractConfigurationException.class)
+                .hasMessageContaining("must be set");
+    }
+
+    @Test
     void rejectsSecuritySchemeWithoutType() {
-        final var schemes = metabad.securitySchemes();
+        final var schemes = schemeWithoutType.securitySchemes();
 
         assertThatThrownBy(() -> OpenApiMetadataMapper.toSecuritySchemes(schemes))
                 .isInstanceOf(ApiContractConfigurationException.class)

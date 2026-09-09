@@ -1,5 +1,4 @@
 @ApiDomain(id = "metabad", securitySchemes = {
-        @SecurityScheme(name = "noType"),
         @SecurityScheme(type = SecuritySchemeType.HTTP, scheme = "bearer")
 })
 package io.github.doriangrelu.generator.fixtures.metabad;
