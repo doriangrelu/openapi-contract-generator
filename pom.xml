@@ -6,7 +6,7 @@
 
     <groupId>io.github.doriangrelu</groupId>
     <artifactId>openapi-contract-parent</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenAPI Contract Generator (parent)</name>
