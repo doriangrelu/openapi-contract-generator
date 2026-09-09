@@ -1,0 +1,66 @@
+name: release
+
+# Publishes the two library modules to Maven Central (Central Portal).
+#
+# Required repository secrets (Settings -> Secrets and variables -> Actions):
+#   CENTRAL_TOKEN_USERNAME  - Portal user token username (central.sonatype.com -> Account)
+#   CENTRAL_TOKEN_PASSWORD  - Portal user token password
+#   GPG_PRIVATE_KEY         - ASCII-armored private key: gpg --armor --export-secret-keys <KEYID>
+#   GPG_PASSPHRASE          - passphrase of that key
+#
+# Trigger: push a tag like `v0.1.0`, or run manually with an explicit version.
+# The bundle is uploaded and validated; with autoPublish=false in the parent pom it is
+# then released with one click from the Portal UI.
+
+on:
+  push:
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version, e.g. 0.1.0'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          server-id: central
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Resolve version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set project version
+        run: >
+          mvn -B --no-transfer-progress
+          org.codehaus.mojo:versions-maven-plugin:2.17.1:set
+          -DnewVersion=${{ steps.version.outputs.value }}
+          -DprocessAllModules -DgenerateBackupPoms=false
+
+      - name: Build, sign and publish
+        run: mvn -B --no-transfer-progress -Prelease clean deploy
+        env:
+          MAVEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}

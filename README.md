@@ -187,6 +187,23 @@ here would then serve as the golden files validating that plugin.
 
 ---
 
+## Releasing (maintainers)
+
+Artifacts are published to **Maven Central** via the Central Portal, namespace
+`io.github.doriangrelu`. The two library modules are released; `openapi-contract-example`
+is not.
+
+- **CI** — push a tag `vX.Y.Z` (or run the *release* workflow manually). It sets the
+  version, builds, signs with GPG and uploads a bundle. With `autoPublish=false` in the
+  parent POM the bundle is released with one click from
+  [central.sonatype.com](https://central.sonatype.com/publishing/deployments).
+  Required repository secrets: `CENTRAL_TOKEN_USERNAME`, `CENTRAL_TOKEN_PASSWORD`,
+  `GPG_PRIVATE_KEY`, `GPG_PASSPHRASE`.
+- **Locally** — `mvn -Prelease clean deploy` with a `central` server (Portal user token)
+  in `settings.xml`, a GPG key, and `MAVEN_GPG_PASSPHRASE` in the environment.
+
+---
+
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE).

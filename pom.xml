@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.openapigenerator</groupId>
+    <groupId>io.github.doriangrelu</groupId>
     <artifactId>openapi-contract-parent</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -43,9 +43,10 @@
     </scm>
 
     <!--
-      TODO before publishing to Maven Central: add <distributionManagement> (or the
-      central-publishing-maven-plugin), GPG signing, and decide the groupId
-      (io.openapigenerator vs io.github.<user>).
+      Publishing: `mvn -Prelease deploy` uploads a signed bundle to the Central Portal
+      (namespace io.github.doriangrelu). Credentials come from the `central` server in
+      settings.xml (a Portal user token); GPG signing runs in the `release` profile.
+      In CI this is driven by .github/workflows/release.yml on a `v*` tag.
     -->
 
     <modules>
@@ -71,6 +72,9 @@
         <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
         <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
+        <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
+        <!-- Check central.sonatype.com for the current version. -->
+        <central-publishing-maven-plugin.version>0.9.0</central-publishing-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -83,12 +87,12 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>io.openapigenerator</groupId>
+                <groupId>io.github.doriangrelu</groupId>
                 <artifactId>openapi-contract-annotations</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.openapigenerator</groupId>
+                <groupId>io.github.doriangrelu</groupId>
                 <artifactId>openapi-contract-generator</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -150,6 +154,57 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Uploads the reactor as one bundle to the Central Portal on `deploy`.
+                 Inert for `test` / `verify` / `install`. The example module opts out
+                 with <skipPublishing>true</skipPublishing>. -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>${central-publishing-maven-plugin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <!-- false: bundle is validated, then released manually from the
+                         Portal UI. Set true once the pipeline is trusted. -->
+                    <autoPublish>false</autoPublish>
+                    <waitUntil>validated</waitUntil>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- Activated by CI (release.yml) and by `mvn -Prelease deploy`. Signs every
+             artifact with GPG, as required by the Central Portal. maven-gpg-plugin 3.2+
+             reads MAVEN_GPG_PASSPHRASE from the environment; loopback pinentry keeps it
+             non-interactive. -->
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${maven-gpg-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
