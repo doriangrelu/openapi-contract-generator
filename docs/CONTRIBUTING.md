@@ -133,15 +133,42 @@ so. Changes there are never breaking changes (see §5).
 
 ---
 
-## 5. Versioning & releasing
+## 5. Branching, versioning & releasing
 
-- **Semantic Versioning.** While `0.x`, any release may change anything.
-- Only types in `io.github.doriangrelu.generator` and the annotation module are API. A
+### Branching — trunk-based
+
+- `main` is the trunk: always green, always releasable.
+- Work on short-lived branches (`feat/…`, `fix/…`) → PR → **squash-merge** to `main`. Even
+  solo: the PR runs CI and keeps history linear.
+- No long-lived `develop` / `release/*` branches. A patch for an already-released version
+  (only if it is ever actually needed) is a branch `X.Y.x` created **on demand** from the
+  `vX.Y.Z` tag.
+
+### Versioning — SemVer
+
+- While `0.x`, any release may change anything.
+- Only types in `io.github.doriangrelu.generator` and the annotations module are API. A
   change to an `…generator.<sub>` package is **not** a breaking change, even if a signature
   changes.
-- A release is a tag `vX.Y.Z`. CI (`.github/workflows/release.yml`) sets the version,
-  builds, GPG-signs and uploads a bundle to the Central Portal; with `autoPublish=false`
-  it is released with one click. See the README *Releasing* section.
+- `main`'s POMs stay on `X.Y.Z-SNAPSHOT`. The concrete release version is stamped from the
+  git tag by the workflow; there is no "release commit".
+
+### Releasing
+
+Run from a clean, up-to-date `main`:
+
+```bash
+scripts/release.sh 0.1.0        # release version; next dev version inferred (0.2.0-SNAPSHOT)
+scripts/release.sh 0.1.0 0.1.1  # explicit next dev version
+```
+
+The script runs `mvn verify`, tags `vX.Y.Z` and pushes it (→
+`.github/workflows/release.yml`: build, GPG-sign, upload a bundle to the Central Portal),
+then bumps `main` to the next `-SNAPSHOT` and pushes. With `autoPublish=false` the bundle
+is released with one click from
+[central.sonatype.com/publishing/deployments](https://central.sonatype.com/publishing/deployments).
+
+Toggles: `DRY_RUN=1`, `ASSUME_YES=1`, `SKIP_VERIFY=1`, `RELEASE_BRANCH=…`.
 
 ---
 

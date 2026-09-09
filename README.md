@@ -197,18 +197,24 @@ testing conventions and the release process are documented in
 
 ## Releasing (maintainers)
 
-Artifacts are published to **Maven Central** via the Central Portal, namespace
+Trunk-based: `main` stays on `X.Y.Z-SNAPSHOT`; the release version is stamped from the git
+tag. Artifacts go to **Maven Central** via the Central Portal, namespace
 `io.github.doriangrelu`. The two library modules are released; `openapi-contract-example`
 is not.
 
-- **CI** — push a tag `vX.Y.Z` (or run the *release* workflow manually). It sets the
-  version, builds, signs with GPG and uploads a bundle. With `autoPublish=false` in the
-  parent POM the bundle is released with one click from
-  [central.sonatype.com](https://central.sonatype.com/publishing/deployments).
-  Required repository secrets: `CENTRAL_TOKEN_USERNAME`, `CENTRAL_TOKEN_PASSWORD`,
-  `GPG_PRIVATE_KEY`, `GPG_PASSPHRASE`.
-- **Locally** — `mvn -Prelease clean deploy` with a `central` server (Portal user token)
-  in `settings.xml`, a GPG key, and `MAVEN_GPG_PASSPHRASE` in the environment.
+```bash
+scripts/release.sh 0.1.0
+```
+
+The script verifies the build, tags `vX.Y.Z` and pushes it, then bumps `main` to the next
+`-SNAPSHOT`. The tag triggers [`.github/workflows/release.yml`](.github/workflows/release.yml)
+which builds, GPG-signs and uploads a bundle; with `autoPublish=false` it is released with
+one click from
+[central.sonatype.com](https://central.sonatype.com/publishing/deployments).
+
+Required repository secrets: `CENTRAL_TOKEN_USERNAME`, `CENTRAL_TOKEN_PASSWORD`,
+`GPG_PRIVATE_KEY`, `GPG_PASSPHRASE`. Details and toggles in
+[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
 ---
 
