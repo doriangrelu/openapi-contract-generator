@@ -1,5 +1,8 @@
 # openapi-contract-generator
 
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.doriangrelu/openapi-contract-generator)](https://central.sonatype.com/namespace/io.github.doriangrelu)
+[![build](https://github.com/doriangrelu/openapi-contract-generator/actions/workflows/build.yml/badge.svg)](https://github.com/doriangrelu/openapi-contract-generator/actions/workflows/build.yml)
+
 Generate **one OpenAPI 3.1 document per bounded context** from annotated Java API
 interfaces, **at build time, without starting an HTTP server**.
 
@@ -84,15 +87,17 @@ Three things, no build-plugin configuration:
 <dependency>
   <groupId>io.github.doriangrelu</groupId>
   <artifactId>openapi-contract-annotations</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
 </dependency>
 <dependency>
   <groupId>io.github.doriangrelu</groupId>
   <artifactId>openapi-contract-generator</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
   <scope>test</scope>
 </dependency>
 ```
+
+Latest version and history: [docs/RELEASES.md](docs/RELEASES.md).
 
 **2. Annotate:** `@ApiContract` on each interface, one `@ApiDomain` `package-info.java` per
 bounded context.
@@ -196,6 +201,8 @@ testing conventions and the release process are documented in
 ---
 
 ## Releasing (maintainers)
+
+Published versions and coordinates: [docs/RELEASES.md](docs/RELEASES.md).
 
 Trunk-based: `main` stays on `X.Y.Z-SNAPSHOT`; the release version is stamped from the git
 tag. Artifacts go to **Maven Central** via the Central Portal, namespace

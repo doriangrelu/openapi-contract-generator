@@ -170,6 +170,27 @@ is released with one click from
 
 Toggles: `DRY_RUN=1`, `ASSUME_YES=1`, `SKIP_VERIFY=1`, `RELEASE_BRANCH=…`.
 
+Release history: [RELEASES.md](RELEASES.md).
+
+### One-time setup
+
+- The `prod` GitHub Environment holds `CENTRAL_TOKEN_USERNAME`, `CENTRAL_TOKEN_PASSWORD`
+  (Portal user token), `GPG_PRIVATE_KEY` (`gpg --armor --export-secret-keys <FPR>`, the
+  *private* block) and `GPG_PASSPHRASE`.
+- The signing key's **public** half must be on a keyserver Central queries, or every
+  deployment fails validation with *"could not find a public key"*:
+
+  ```bash
+  gpg --keyserver hkps://keyserver.ubuntu.com --send-keys <FPR>
+  # if that server "ignores" the key (seen with ed25519), also:
+  #   curl --data-urlencode "keytext@<(gpg --armor --export <FPR>)" https://keys.openpgp.org/vks/v1/upload  (as JSON)
+  # verify:
+  curl -sS "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x<FPR>" | head -1
+  ```
+
+  RSA 4096 is accepted by every keyserver without fuss; EdDSA keys can be rejected by
+  `keyserver.ubuntu.com`.
+
 ---
 
 ## 6. Definition of Done
