@@ -226,6 +226,13 @@ key), `GPG_PASSPHRASE`. Details and toggles in
 
 ---
 
+## Acknowledgements
+
+Thanks to [@ramziGY](https://github.com/ramziGY) for helping think through the design of
+this solution.
+
+---
+
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE).

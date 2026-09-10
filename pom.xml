@@ -35,6 +35,16 @@
         </developer>
     </developers>
 
+    <contributors>
+        <contributor>
+            <name>ramziGY</name>
+            <url>https://github.com/ramziGY</url>
+            <roles>
+                <role>design advisor</role>
+            </roles>
+        </contributor>
+    </contributors>
+
     <scm>
         <connection>scm:git:https://github.com/doriangrelu/openapi-contract-generator.git</connection>
         <developerConnection>scm:git:git@github.com:doriangrelu/openapi-contract-generator.git</developerConnection>
